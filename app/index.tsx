@@ -1,15 +1,13 @@
-import { Text, View } from "react-native";
+import { NativeBaseProvider, StatusBar } from 'native-base';
 
-export default function Index() {
+import { THEMES } from "@/styles/themes";
+import Routes from './Routes';
+
+export default function App() {
   return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <Text>Edit app/index.tsx to edit this screen.</Text>
-    </View>
+    <NativeBaseProvider theme={THEMES}>
+      <StatusBar backgroundColor={THEMES.colors.green[800]} />
+      <Routes />
+    </NativeBaseProvider>
   );
 }
