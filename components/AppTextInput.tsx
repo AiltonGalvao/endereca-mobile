@@ -4,25 +4,34 @@ interface InputProps {
   label?: string;
   placeholder: string;
   secureTextEntry?: boolean;
-  leftIcon?: React.ReactNode;
+  value?: string;
+  onChangeText?: (text: string) => void;
+  mt?: number;
+  width?: string;
 }
 
 export function AppTextInput ({ 
   label, 
   placeholder, 
-  secureTextEntry = false
+  secureTextEntry = false,
+  mt = 3,
+  width = "100%",
+  value,
+  onChangeText
 } : InputProps) : JSX.Element {
   return (
-    <FormControl mt={3}>
+    <FormControl mt={mt}>
       {label && <FormControl.Label>{label}</FormControl.Label>}
       <Input
         placeholder={placeholder}
         size="lg"
-        w="100%"
+        w={width}
         borderRadius="lg"
         bgColor="gray.100"
         secureTextEntry={secureTextEntry}
         shadow={3}
+        value={value}
+        onChangeText={onChangeText}
       />
     </FormControl>
   );

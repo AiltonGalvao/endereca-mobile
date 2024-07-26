@@ -8,14 +8,14 @@ interface TituloProps extends ITextProps {
 export function AppTitle({ children, ...rest }: TituloProps){
   return (
     <Text
-        fontSize="2xl"
-        fontWeight="bold"
-        color="gray.500"
-        textAlign="center"
-        mt={5}
-        {...rest}
-      >
-        {children}
-      </Text>
+      fontSize="2xl"
+      fontWeight="bold"
+      color="gray.500"
+      textAlign="center"
+      mt={5}
+      {...rest}
+    >
+      {children}
+    </Text>
   )
 }
