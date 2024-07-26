@@ -6,10 +6,8 @@ import { useEffect, useState } from "react";
 import Ionicons from "react-native-vector-icons/Ionicons"; // Isso aqui fica dando erro na IDE mas funciona
 import { encode } from "pluscodes";
 import { registerAddress } from "@/services/Address";
-import { User } from "@/interfaces/User";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { getUserData } from "@/services/User";
-import Geolocation from '@react-native-community/geolocation';
+import * as Location from "expo-location";
 
 export default function Register(){
   const [plusCode, setPlusCode] = useState("00000000+0000");
@@ -19,34 +17,25 @@ export default function Register(){
   const [locationType, setLocationType] = useState("");
   const [project, setProject] = useState("");
   const [observations, setObservations] = useState("");
-
-  const [userData, setUserData] = useState({} as User);
   const toast = useToast();
 
-  useEffect(() => {
-    async function userData() {
-      const userId = await AsyncStorage.getItem("userId");
-
-      if(!userId) return null;
-
-      const result = await getUserData(userId);
-      if(result) {
-        setUserData(result);
-        console.log(result);
-      }
-    }
-    userData();
-  }, []);
-
   async function getUserLocation() {
-    Geolocation.getCurrentPosition(info => console.log(info));
+    let { status } = await Location.requestForegroundPermissionsAsync();
+
+    if (status !== "granted") {
+      return;
+    }
+
+    const location = await Location.getCurrentPositionAsync();
+    setLatitude(String(location.coords.latitude));
+    setLongitude(String(location.coords.longitude));
   }
 
   async function register(){
     const result = await registerAddress({
       ...(name && { name }), // Adiciona a propriedade name apenas se ela não estiver vazia
       locationType: locationType,
-      createdBy: userData.email,
+      createdBy: await AsyncStorage.getItem("userId") || " ", // Para fazer o Typescript parar de chorar, pois se der string vazia não vai registrar
       project: project,
       ...(observations && {observations}), // Mesma coisa de cima
       plusCode: plusCode,
@@ -144,7 +133,11 @@ export default function Register(){
 
           <Text color="green.800" fontWeight="bold" fontSize="md">{plusCode}</Text>
       </Box>
-      <AppButton>Cadastrar Local</AppButton>
+
+      <AppButton onPress={register}>
+        Cadastrar Local
+      </AppButton>
+
       </VStack>
     </ScrollView>
   );
