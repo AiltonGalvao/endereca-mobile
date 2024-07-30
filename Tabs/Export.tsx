@@ -3,8 +3,11 @@ import { AppCheckBox } from "@/components/AppCheckBox";
 import { AppTextInput } from "@/components/AppTextInput";
 import { AppTitle } from "@/components/AppTitle";
 import { filterAddresses } from "@/services/Address";
-import { VStack, Box } from "native-base";
-import { useState } from "react";
+import { convertToCSV } from "@/utils/conversions";
+import { VStack, Box, Text, Select } from "native-base";
+import { Dispatch, SetStateAction, useState } from "react";
+
+// TODO: Fazer um campo para filtrar por data
 
 export default function Export(){
 
@@ -16,10 +19,23 @@ export default function Export(){
   const [observations, setObservations] = useState("");
   const [plusCode, setPlusCode] = useState("");
   const [format, setFormat] = useState("");
-  const [searchResult, setSearchResult] = useState([]);
+  const [searchResult, setSearchResult] : [[], Dispatch<[]>] = useState([]);
+
+  async function exportAddresses() {
+    convertToCSV(searchResult);
+  }
 
   async function search() {
-    const result = await filterAddresses({project: "Projeto2024"});
+    const result = await filterAddresses(
+      {
+        ...(name && { name }),
+        ...(locationType && { locationType }),
+        ...(createdBy && { createdBy }),
+        ...(project && { project }),
+        ...(observations && { observations }),
+        ...(plusCode && { plusCode })
+      }
+    );
 
     if(result) {
       setSearchResult(result)
@@ -39,17 +55,29 @@ export default function Export(){
           onChangeText={setName}
       />
 
-      <AppTextInput
-          placeholder="Tipo do local"
-          value={locationType}
-          onChangeText={setLocationType}
-      />
-
-      <AppTextInput
-          placeholder="Data"
-          value={createdAt}
-          onChangeText={setCreatedAt}
-      />
+      <Select
+        selectedValue={locationType}
+        mt={3}
+        w="100%"
+        borderRadius="lg"
+        size="lg"
+        bgColor="gray.100"
+        color="gray.300"
+        shadow={3}
+        accessibilityLabel="Escolha o tipo de localização"
+        placeholder="Tipo do local"
+        onValueChange={itemValue => setLocationType(itemValue)}
+      >
+        <Select.Item label="Escolha o tipo de localização" value=""/>
+        <Select.Item label="Domicílio Particular" value="Domicílio Particular"/>
+        <Select.Item label="Domicílio Coletivo" value="Domicílio Coletivo"/>
+        <Select.Item label="Estabelecimento Agropecuário" value="Estabelecimento Agropecuário"/>
+        <Select.Item label="Estabelecimento de Ensino" value="Estabelecimento de Ensino"/>
+        <Select.Item label="Estabelecimento de Saúde" value="Estabelecimento de Saúde"/>
+        <Select.Item label="Estabelecimento Religioso" value="Estabelecimento Religioso"/>
+        <Select.Item label="Estabelecimento Outros" value="Estabelecimento Outros"/>
+        <Select.Item label="Edicação em Construção" value="Edicação em Construção"/>
+      </Select>
 
       <AppTextInput
           placeholder="Responsável pelo cadastro"
@@ -70,9 +98,9 @@ export default function Export(){
       />
 
       <AppTextInput
-          placeholder="Observações"
-          value={observations}
-          onChangeText={setObservations}
+          placeholder="Pluscode"
+          value={plusCode}
+          onChangeText={setPlusCode}
       />
 
       <VStack flexDir="row">
@@ -88,15 +116,7 @@ export default function Export(){
           mt={3}
           ml={5}
         >
-          Oi
-        </AppCheckBox>
-
-        <AppCheckBox
-          value={format}
-          mt={3}
-          ml={5}
-        >
-          Oi
+          KML
         </AppCheckBox>
 
         <Box flexGrow={1} />
@@ -106,9 +126,13 @@ export default function Export(){
         </AppButton>
       </VStack>
 
+      <AppTitle fontSize="md" mt={0}>
+        {searchResult.length} resultados
+      </AppTitle>
+
       <Box flexGrow={1} />
 
-      <AppButton mb={5}>
+      <AppButton mb={5} onPress={exportAddresses}>
         Download
       </AppButton>
     </VStack>

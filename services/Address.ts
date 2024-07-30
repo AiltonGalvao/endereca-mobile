@@ -12,7 +12,7 @@ async function getTokenHeader() {
 
 export async function searchAddresses(searchString: string) {
     try {
-        const result = await api.get("/addresses", await getTokenHeader());
+        const result = await api.get(`/addresses/search?searchString=${searchString}`, await getTokenHeader());
         return result.data;
     }
     catch(error){
@@ -22,7 +22,7 @@ export async function searchAddresses(searchString: string) {
 }
 
 export async function filterAddresses(searchParams: object) {
-    let searchString = "/addresses/search?";
+    let searchString = "/addresses/filtered_search?";
     
     const params = new URLSearchParams();
 

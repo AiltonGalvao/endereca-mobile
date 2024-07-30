@@ -1,7 +1,7 @@
 import { AppButton } from "@/components/AppButton";
 import { AppTextInput } from "@/components/AppTextInput";
 import { AppTitle } from "@/components/AppTitle";
-import { VStack, ScrollView, Box, Text, useToast } from "native-base";
+import { VStack, ScrollView, Box, Text, useToast, Select } from "native-base";
 import { useEffect, useState } from "react";
 import Ionicons from "react-native-vector-icons/Ionicons"; // Isso aqui fica dando erro na IDE mas funciona
 import { encode } from "pluscodes";
@@ -84,24 +84,46 @@ export default function Register(){
             value={name}
             onChangeText={setName}
           />
-          <AppTextInput
-            label="Tipo do Local"
-            placeholder="Insira o tipo do local"
-            value={locationType}
-            onChangeText={setLocationType}
-          />
+
+          <Text fontSize="sm" fontWeight="bold" color={"gray.500"} mt={3} mb={1}>Tipo do Local</Text>
+          <Select
+            selectedValue={locationType}
+            mt={0}
+            w="100%"
+            borderRadius="lg"
+            size="lg"
+            bgColor="gray.100"
+            color="gray.300"
+            shadow={3}
+            accessibilityLabel="Escolha o tipo de localização"
+            placeholder="Tipo do local"
+            onValueChange={itemValue => setLocationType(itemValue)}
+          >
+            <Select.Item label="Escolha o tipo de localização" value=""/>
+            <Select.Item label="Domicílio Particular" value="Domicílio Particular"/>
+            <Select.Item label="Domicílio Coletivo" value="Domicílio Coletivo"/>
+            <Select.Item label="Estabelecimento Agropecuário" value="Estabelecimento Agropecuário"/>
+            <Select.Item label="Estabelecimento de Ensino" value="Estabelecimento de Ensino"/>
+            <Select.Item label="Estabelecimento de Saúde" value="Estabelecimento de Saúde"/>
+            <Select.Item label="Estabelecimento Religioso" value="Estabelecimento Religioso"/>
+            <Select.Item label="Estabelecimento Outros" value="Estabelecimento Outros"/>
+            <Select.Item label="Edicação em Construção" value="Edicação em Construção"/>
+          </Select>
+
           <AppTextInput
             label="Projeto"
             placeholder="Insira o nome do projeto"
             value={project}
             onChangeText={setProject}
           />
+
           <AppTextInput
             label="Observações"
             placeholder="Adicione observações (opcional)"
             value={observations}
             onChangeText={setObservations}
           />
+
           <Text fontSize="sm" fontWeight="bold" color={"gray.500"} mt={3} mb={1}>Localização</Text>
           <VStack flexDir="row">
             <Box w="45%">
