@@ -1,5 +1,6 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import Ionicons from "react-native-vector-icons/Ionicons"; // Funciona mas não sei porque dá erro 
+// @ts-expect-error: Funciona mas a IDE estava reclamando
+import Ionicons from "react-native-vector-icons/Ionicons";
 
 import Map from "./Map";
 import Register from "./Register";

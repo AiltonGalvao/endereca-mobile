@@ -3,9 +3,9 @@ import { AppCheckBox } from "@/components/AppCheckBox";
 import { AppTextInput } from "@/components/AppTextInput";
 import { AppTitle } from "@/components/AppTitle";
 import { filterAddresses } from "@/services/Address";
-import { convertToCSV } from "@/utils/conversions";
-import { VStack, Box, Text, Select } from "native-base";
-import { Dispatch, SetStateAction, useState } from "react";
+import { convertToCSV, convertToKML } from "@/utils/conversions";
+import { VStack, Box, Select } from "native-base";
+import { Dispatch, useState } from "react";
 
 // TODO: Fazer um campo para filtrar por data
 
@@ -13,7 +13,7 @@ export default function Export(){
 
   const [name, setName] = useState("");
   const [locationType, setLocationType] = useState("");
-  const [createdAt, setCreatedAt] = useState("");
+  // const [createdAt, setCreatedAt] = useState("");
   const [createdBy, setCreatedBy] = useState("");
   const [project, setProject] = useState("");
   const [observations, setObservations] = useState("");
@@ -22,7 +22,12 @@ export default function Export(){
   const [searchResult, setSearchResult] : [[], Dispatch<[]>] = useState([]);
 
   async function exportAddresses() {
-    convertToCSV(searchResult);
+    if(format === "CSV") {
+      convertToCSV(searchResult);
+    }
+    else {
+      convertToKML(searchResult);
+    }
   }
 
   async function search() {

@@ -1,6 +1,6 @@
 import { AppTextInput } from "@/components/AppTextInput";
 import { AppTitle } from "@/components/AppTitle";
-import { VStack, Image, ScrollView, Box, Center } from "native-base";
+import { VStack, ScrollView } from "native-base";
 import MapView from 'react-native-maps';
 
 export default function Map(){

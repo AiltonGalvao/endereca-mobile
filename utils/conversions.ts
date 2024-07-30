@@ -1,8 +1,26 @@
+import tokml from "geojson-to-kml";
+
+interface Address {
+    name?: string,
+    locationType: string,
+    createdBy: {
+        email: string
+    }
+    createdAt: Date
+    project: string,
+    observations?: string,
+    plusCode: string,
+    location: {
+        type: string
+        coordinates: [number, number]
+    }
+}
+
 export function formatDateString(date: string) {
     return `${date.slice(8, 10)}/${date.slice(5, 7)}/${date.slice(0, 4)} ${date.slice(11, 19)}`;
 }
 
-export function convertToCSV(object_list: []) {
+export function convertToCSV(list_of_addresses: Address[]) {
     const csvString = [
         [
             "Nome",
@@ -15,7 +33,7 @@ export function convertToCSV(object_list: []) {
             "Latitude",
             "Longitude"
         ],
-        ...object_list.map(address => [
+        ...list_of_addresses.map(address => [
             address["name"],
             address["locationType"],
             address["createdAt"],
@@ -31,4 +49,34 @@ export function convertToCSV(object_list: []) {
          .join("\n");
 
     console.log(csvString);
+}
+
+export function convertToGeoJSON(list_of_addresses: Address[]) {
+    const geoJSON = {
+        type: "FeatureCollection",
+        features: list_of_addresses.map(address => ({
+          type: "Feature",
+          geometry: {
+            type: address.location.type,
+            coordinates: address.location.coordinates
+          },
+          properties: {
+            name: address.name || address.locationType,
+            Pluscode: `${address.plusCode}`,
+            Tipo_local: `${address.locationType}`,
+            Criado_por: `${address.createdBy.email}`,
+            Criado_em: `${address.createdAt}`,
+            Projeto: `${address.project}`,
+            Observacoes: `${address.observations || address.locationType}`
+          }
+        }))
+      };
+    
+      return geoJSON;
+}
+
+export function convertToKML(list_of_addresses: Address[]) {
+    const obj = convertToGeoJSON(list_of_addresses);
+    const test = tokml(obj)
+    console.log(test);
 }

@@ -3,7 +3,8 @@ import { AppTextInput } from "@/components/AppTextInput";
 import { AppTitle } from "@/components/AppTitle";
 import { VStack, ScrollView, Box, Text, useToast, Select } from "native-base";
 import { useEffect, useState } from "react";
-import Ionicons from "react-native-vector-icons/Ionicons"; // Isso aqui fica dando erro na IDE mas funciona
+// @ts-expect-error: Funciona mas a IDE estava reclamando
+import Ionicons from "react-native-vector-icons/Ionicons";
 import { encode } from "pluscodes";
 import { registerAddress } from "@/services/Address";
 import AsyncStorage from "@react-native-async-storage/async-storage";
