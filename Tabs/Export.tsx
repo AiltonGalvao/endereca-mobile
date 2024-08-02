@@ -3,7 +3,7 @@ import { AppCheckBox } from "@/components/AppCheckBox";
 import { AppTextInput } from "@/components/AppTextInput";
 import { AppTitle } from "@/components/AppTitle";
 import { filterAddresses } from "@/services/Address";
-import { convertToCSV, convertToKML } from "@/utils/conversions";
+import { saveAsCSV, saveAsKML } from "@/utils/conversions";
 import { VStack, Box, Select } from "native-base";
 import { Dispatch, useState } from "react";
 
@@ -23,10 +23,10 @@ export default function Export(){
 
   async function exportAddresses() {
     if(format === "CSV") {
-      convertToCSV(searchResult);
+      saveAsCSV(searchResult);
     }
     else {
-      convertToKML(searchResult);
+      saveAsKML(searchResult);
     }
   }
 
@@ -112,6 +112,7 @@ export default function Export(){
         <AppCheckBox
           value={format}
           mt={3}
+          onChange={setFormat}
         >
           CSV
         </AppCheckBox>
@@ -120,6 +121,7 @@ export default function Export(){
           value={format}
           mt={3}
           ml={5}
+          onChange={setFormat}
         >
           KML
         </AppCheckBox>

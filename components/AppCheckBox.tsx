@@ -6,13 +6,15 @@ interface CheckBoxProps extends ITextProps{
     children: ReactNode
     mt?: number
     ml?: number
+    onChange?: (event: any) => void;
   }
 
 export function AppCheckBox({ 
     children,
     value,
     mt,
-    ml
+    ml,
+    onChange
 }: CheckBoxProps) {
     return (
         <Checkbox
@@ -21,6 +23,7 @@ export function AppCheckBox({
             mt={mt}
             ml={ml}
             value={value}
+            onChange={onChange}
         >
             {children}
         </Checkbox>

@@ -1,4 +1,6 @@
+// @ts-expect-error: Funciona mas a IDE estava reclamando
 import tokml from "geojson-to-kml";
+import { saveFile } from "./fileHandlers";
 
 interface Address {
     name?: string,
@@ -20,7 +22,7 @@ export function formatDateString(date: string) {
     return `${date.slice(8, 10)}/${date.slice(5, 7)}/${date.slice(0, 4)} ${date.slice(11, 19)}`;
 }
 
-export function convertToCSV(list_of_addresses: Address[]) {
+export function saveAsCSV(list_of_addresses: Address[]) {
     const csvString = [
         [
             "Nome",
@@ -47,11 +49,17 @@ export function convertToCSV(list_of_addresses: Address[]) {
         ]
          .map(e => e.join(",")) 
          .join("\n");
-
-    console.log(csvString);
+    
+    saveFile(csvString, "csv");
 }
 
-export function convertToGeoJSON(list_of_addresses: Address[]) {
+export function saveAsKML(list_of_addresses: Address[]) {
+    const obj = convertToGeoJSON(list_of_addresses);
+    const kmlString = tokml(obj);
+    saveFile(kmlString, "kml");
+}
+
+function convertToGeoJSON(list_of_addresses: Address[]) {
     const geoJSON = {
         type: "FeatureCollection",
         features: list_of_addresses.map(address => ({
@@ -73,10 +81,4 @@ export function convertToGeoJSON(list_of_addresses: Address[]) {
       };
     
       return geoJSON;
-}
-
-export function convertToKML(list_of_addresses: Address[]) {
-    const obj = convertToGeoJSON(list_of_addresses);
-    const test = tokml(obj)
-    console.log(test);
 }
