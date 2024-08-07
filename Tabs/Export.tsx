@@ -21,6 +21,14 @@ export default function Export(){
   const [format, setFormat] = useState("");
   const [searchResult, setSearchResult] : [[], Dispatch<[]>] = useState([]);
 
+  function setKML() {
+    setFormat("KML");
+  }
+
+  function setCSV() {
+    setFormat("CSV");
+  }
+
   async function exportAddresses() {
     if(format === "CSV") {
       saveAsCSV(searchResult);
@@ -44,7 +52,6 @@ export default function Export(){
 
     if(result) {
       setSearchResult(result)
-      console.log(result)
     }
   }
 
@@ -112,7 +119,7 @@ export default function Export(){
         <AppCheckBox
           value={format}
           mt={3}
-          onChange={setFormat}
+          onChange={setCSV}
         >
           CSV
         </AppCheckBox>
@@ -121,7 +128,7 @@ export default function Export(){
           value={format}
           mt={3}
           ml={5}
-          onChange={setFormat}
+          onChange={setKML}
         >
           KML
         </AppCheckBox>

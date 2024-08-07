@@ -1,5 +1,8 @@
-import { VStack, Text } from "native-base";
+import { VStack, Text, Box } from "native-base";
 import { AppTitle } from "./AppTitle";
+import { AppButton } from "./AppButton";
+// @ts-expect-error: Funciona mas a IDE estava reclamando
+import Ionicons from "react-native-vector-icons/Ionicons";
 
 interface CardProps {
     name?: string,
@@ -9,7 +12,8 @@ interface CardProps {
     project: string,
     observations?: string,
     plusCode: string,
-    location: string
+    location: string,
+    onPress?: () => void;
 }
 
 export function AddressCard({
@@ -20,13 +24,24 @@ export function AddressCard({
     project,
     observations,
     plusCode,
-    location
-}: CardProps) {
+    location,
+    onPress
+}: CardProps, { navigation }: any) {
     return(
         <VStack w="99%" alignSelf="center" borderRadius="lg" p={5} shadow={3} mt={5} bgColor="white">
-            <AppTitle fontSize="lg" alignSelf="flex-start" mt={0}>
-                {plusCode} {"\n"}
-            </AppTitle>
+            <VStack flexDir="row">
+                <AppTitle fontSize="lg" alignSelf="flex-start" mt={0}>
+                    {plusCode} {"\n"}
+                </AppTitle>
+
+                <Box flexGrow={1} />
+
+                <Box w="11%" alignSelf="center">
+                    <AppButton mt={-5} onPress={onPress}>
+                        <Ionicons name="search-outline" color="#fff"/>
+                    </AppButton>
+                </Box>
+            </VStack>
             <Text fontWeight="bold" color="gray.500">
                 Tipo do Local: {locationType} {"\n"}
                 Criado em: {createdAt} {"\n"}

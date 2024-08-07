@@ -19,11 +19,11 @@ const screenOptions = {
 }
 
 const tabs = [
-  {
-    name: "Mapa",
-    component: Map,
-    icon: "map"
-  },
+  //{ Função de mapa está incompleta no momento
+  //  name: "Mapa",
+  //  component: Map,
+  //  icon: "map"
+  //},
   {
     name: "Cadastrar",
     component: Register,

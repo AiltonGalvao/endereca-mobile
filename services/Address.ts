@@ -32,8 +32,6 @@ export async function filterAddresses(searchParams: object) {
 
     searchString += params.toString();
 
-    console.log(searchString);
-
     try {
         const result = await api.get(searchString, await getTokenHeader());
         return result.data;
@@ -49,7 +47,32 @@ export async function registerAddress(address: Address) {
 
     try {
         const result = await api.post("/addresses", address, await getTokenHeader());
-        console.log(result.data);
+        return result.data;
+    }
+    catch(error) {
+        console.log(error);
+        return null;
+    }
+}
+
+export async function getOneAddress(addressId: string) {
+    if(!addressId) return null;
+
+    try {
+        const result = await api.get(`/addresses/${addressId}`, await getTokenHeader());
+        return result.data;
+    }
+    catch(error) {
+        console.log(error);
+        return null;
+    }
+}
+
+export async function deleteOneAddress(addressId: string) {
+    if(!addressId) return null;
+
+    try {
+        const result = await api.delete(`/addresses/${addressId}`, await getTokenHeader());
         return result.data;
     }
     catch(error) {

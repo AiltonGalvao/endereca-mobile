@@ -1,3 +1,4 @@
+import { NavigationProps } from "@/@types/navigation";
 import { AddressCard } from "@/components/AddressCard";
 import { AppButton } from "@/components/AppButton";
 import { AppTextInput } from "@/components/AppTextInput";
@@ -8,6 +9,7 @@ import { VStack, ScrollView } from "native-base";
 import { useState } from "react";
 
 export interface Address {
+  _id: string,
   name?: string,
   locationType: string,
   createdAt: string,
@@ -18,7 +20,7 @@ export interface Address {
   location: string
 }
 
-export default function Addresses(){
+export default function Addresses({ navigation }: NavigationProps<"Addresses">){
 
   const [searchState, setSearchState] = useState("");
   const [searchResult, setSearchResult] = useState([]);
@@ -28,7 +30,6 @@ export default function Addresses(){
 
     if(result) {
       setSearchResult(result)
-      console.log(result)
     }
   }
 
@@ -61,6 +62,7 @@ export default function Addresses(){
             observations={address.observations}
             plusCode={address.plusCode}
             location={address.location}
+            onPress={() => navigation.navigate("AddressInformation", { addressId: address._id })}
           />
       </VStack>
       ))}

@@ -19,7 +19,6 @@ export default function Profile({ navigation }: { navigation: any }){
       const result = await getUserData(userId);
       if(result) {
         setUserData(result);
-        console.log(result);
       }
     }
     userData();
