@@ -6,7 +6,8 @@ import { useEffect, useState } from "react";
 import { performLogin } from "@/services/AuthService";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { jwtDecode } from "jwt-decode";
-// import Logo from "@/assets/Logo.png";
+// @ts-expect-error: Funciona mas a IDE estava reclamando
+import Logo from "@/assets/Logo.png";
 
 export default function Login({ navigation }: { navigation: any }) {
   const [email, setEmail] = useState("");

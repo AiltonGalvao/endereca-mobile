@@ -10,6 +10,17 @@ async function getTokenHeader() {
     return config;
 }
 
+export async function getAddresses() {
+    try {
+        const result = await api.get("/addresses", await getTokenHeader());
+        return result.data;
+    }
+    catch(error){
+        console.log(error);
+        return null;
+    }
+}
+
 export async function searchAddresses(searchString: string) {
     try {
         const result = await api.get(`/addresses/search?searchString=${searchString}`, await getTokenHeader());

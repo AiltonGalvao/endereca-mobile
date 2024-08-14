@@ -3,7 +3,7 @@ import { AppTitle } from "@/components/AppTitle";
 import { deleteOneAddress, getOneAddress } from "@/services/Address";
 import { formatDateString } from "@/utils/conversions";
 import { Box, Button, Divider, Modal, ScrollView, Text, VStack } from "native-base";
-import { useEffect, useState } from "react";
+import { useEffect, useState, FC } from "react";
 import MapView, { Marker } from "react-native-maps";
 
 export default function AddressInformation({ route, navigation }: any) {
@@ -41,6 +41,24 @@ export default function AddressInformation({ route, navigation }: any) {
         }
         getAddressData();
     }, [addressId]);
+
+    interface SafeComponentLoaderProps {
+        component: FC;
+        fallback?: React.ReactNode;
+    }
+
+    const SafeComponentLoader: FC<SafeComponentLoaderProps> = ({ component: Component, fallback }) => {
+        const [hasError, setHasError] = useState(false);
+      
+        try {
+          if (hasError) {
+            throw new Error();
+          }
+          return <Component />;
+        } catch (error) {
+          return <>{fallback || <Text fontWeight="bold" color="gray.500" mt={5}>Falha ao carregar o Mapa</Text>}</>;
+        }
+    };
 
     const handleDelete = async () => {
         try {
