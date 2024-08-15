@@ -6,6 +6,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { VStack, Avatar, Box, HStack, Switch } from "native-base";
 import { useEffect, useState, useContext } from "react";
 import { ModeContext } from "@/app/ModeContext";
+import { setupOfflineDatabase, synchronizeDatabase } from "@/database/offlineDatabase";
 
 export default function Profile({ navigation }: { navigation: any }) {
   const [userData, setUserData] = useState({} as User);
@@ -22,25 +23,40 @@ export default function Profile({ navigation }: { navigation: any }) {
       const result = await getUserData(userId);
       if (result) {
         setUserData(result);
+        await AsyncStorage.setItem("userName", userData.name)
       }
     }
     userData();
   }, []);
 
-  function handleToggle() {
+  useEffect(() => {
+    AsyncStorage.setItem('isOffline', JSON.stringify(isOffline));
+
+  }, [isOffline]);
+
+  async function handleToggle() {
     if (isSwitchEnabled) {
       setIsOffline(!isOffline);
+
+      if (!isOffline) {
+        await setupOfflineDatabase();
+      }
+      else {
+        await synchronizeDatabase();
+      }
+
       setIsSwitchEnabled(false);
 
       setTimeout(() => {
         setIsSwitchEnabled(true);
-      }, 10000);
+      }, 5000);
     }
   }
 
   function logout() {
     AsyncStorage.removeItem("token");
-    AsyncStorage.removeItem("clientId");
+    AsyncStorage.removeItem("userId");
+    AsyncStorage.removeItem("userName");
     navigation.replace("Login");
   }
 

@@ -1,5 +1,7 @@
 import { getAddresses } from "@/services/Address";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SQLite from "expo-sqlite/legacy";
+import moment from 'moment';
 
 interface Address {
     _id: string,
@@ -10,7 +12,7 @@ interface Address {
     project: string,
     observations?: string,
     plusCode: string,
-    location: {coordinates: ["longitude", "latitude"]}
+    location: {coordinates: [number, number]}
   }
 
 export async function setupOfflineDatabase() {
@@ -61,8 +63,10 @@ export async function setupOfflineDatabase() {
       `);
     });
 
+    console.log("Tabelas criadas");
+
     // Puxa os dados da API
-    getAddresses().then(addresses => {
+    await getAddresses(false).then(addresses => {
       db.transaction(tx => {
         addresses.forEach((address : Address) => {
           const { _id, name, locationType, createdBy, project, observations, plusCode, createdAt } = address;
@@ -78,4 +82,183 @@ export async function setupOfflineDatabase() {
         });
       });
     });
+
+    //db.transaction(tx => {
+    //    tx.executeSql('SELECT * FROM addresses', [], (_, { rows }) => {
+    //      console.log('Dados na tabela addresses:');
+    //      rows._array.forEach((row) => {
+    //        console.log(row);
+    //      });
+    //    });
+    //});
 }
+
+export async function searchAddressesOffline(searchString: string) {
+    const db = SQLite.openDatabase('addresses.db');
+    
+    return new Promise((resolve, reject) => {
+      db.transaction(tx => {
+        const regex = `%${searchString}%`;
+  
+        tx.executeSql(
+          `SELECT * FROM addresses WHERE
+            name LIKE ? OR
+            locationType LIKE ? OR
+            project LIKE ? OR
+            observations LIKE ? OR
+            plusCode LIKE ?`,
+          [regex, regex, regex, regex, regex],
+          (_, { rows }) => {
+            resolve(rows._array);
+          },
+        );
+      });
+    });
+}
+
+export async function getAddressesOffline() {
+  const db = SQLite.openDatabase('addresses.db');
+
+  return new Promise((resolve, reject) => {
+      db.transaction(tx => {
+          tx.executeSql(
+              `SELECT * FROM addresses`,
+              [],
+              (_, { rows }) => {
+                  resolve(rows._array);
+              },
+              (_, error) => {
+                  reject(error);
+                  return false;
+              }
+          );
+      });
+  });
+}
+
+export async function searchFilteredAddressesOffline(filters: {
+    name?: string;
+    locationType?: string;
+    createdAt?: string;
+    createdBy?: string;
+    project?: string;
+    observations?: string;
+    plusCode?: string;
+}) {
+    const db = SQLite.openDatabase('addresses.db');
+  
+    return new Promise((resolve, reject) => {
+      db.transaction(tx => {
+        let query = `SELECT * FROM addresses WHERE 1=1`;
+        const params: any[] = [];
+  
+        if (filters.name) {
+          query += ` AND name LIKE ?`;
+          params.push(`%${filters.name}%`);
+        }
+        if (filters.locationType) {
+          query += ` AND locationType LIKE ?`;
+          params.push(`%${filters.locationType}%`);
+        }
+        if (filters.createdAt) {
+          query += ` AND createdAt LIKE ?`;
+          params.push(`%${filters.createdAt}%`);
+        }
+        if (filters.project) {
+          query += ` AND project LIKE ?`;
+          params.push(`%${filters.project}%`);
+        }
+        if (filters.observations) {
+          query += ` AND observations LIKE ?`;
+          params.push(`%${filters.observations}%`);
+        }
+        if (filters.plusCode) {
+          const formattedPlusCode = filters.plusCode.replace(/ /g, "+");
+          query += ` AND plusCode LIKE ?`;
+          params.push(`%${formattedPlusCode}%`);
+        }
+        if (filters.createdBy) {
+          query += ` AND createdByName LIKE ?`;
+          params.push(`%${filters.createdBy}%`);
+        }
+  
+      tx.executeSql(
+        query,
+        params,
+        (_, { rows }) => {
+          resolve(rows._array);
+        },
+        (_, error) => {
+          reject(error);
+          return false;
+        }
+      );
+    });
+  });
+}
+
+export async function synchronizeDatabase() {
+  console.log("test");
+}
+
+export async function registerAddressOffline(address: {
+  name?: string;
+  locationType: string;
+  createdBy: string;
+  project: string;
+  observations?: string;
+  plusCode: string;
+  location: {
+    type: "Point";
+    coordinates: [number, number];
+  };
+}) {
+  const db = SQLite.openDatabase('addresses.db');
+
+  // Obter informações adicionais
+  const createdAt = moment().format('YYYY-MM-DDTHH:mm:ss.SSSZZ');
+  const createdByName = await AsyncStorage.getItem("userName");
+  const _id = Date.now().toString();
+
+  return new Promise<void>((resolve, reject) => {
+    db.transaction(tx => {
+      // Query para inserir o endereço na tabela 'addresses'
+      const query = `
+        INSERT INTO addresses 
+          (_id, name, locationType, createdBy, createdByName, project, observations, plusCode, latitude, longitude, createdAt)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+      `;
+
+      const params = [
+        _id,
+        address.name || null,
+        address.locationType,
+        address.createdBy,
+        createdByName,
+        address.project,
+        address.observations || null,
+        address.plusCode,
+        address.location.coordinates[1], // latitude
+        address.location.coordinates[0], // longitude
+        createdAt
+      ];
+
+      console.log(params);
+
+      tx.executeSql(query, params, 
+        (_, result) => {
+          console.log("Insert successful", result);
+          resolve();
+        }, 
+        (_, error) => {
+          console.error("Insert failed", error);
+          reject(error);
+          return false;
+        }
+      );
+    });
+  });
+}
+
+
+  

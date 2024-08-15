@@ -1,3 +1,4 @@
+import { ModeContext } from "@/app/ModeContext";
 import { AppButton } from "@/components/AppButton";
 import { AppCheckBox } from "@/components/AppCheckBox";
 import { AppTextInput } from "@/components/AppTextInput";
@@ -5,12 +6,12 @@ import { AppTitle } from "@/components/AppTitle";
 import { filterAddresses } from "@/services/Address";
 import { saveAsCSV, saveAsKML } from "@/utils/conversions";
 import { VStack, Box, Select } from "native-base";
-import { Dispatch, useState } from "react";
+import { Dispatch, useContext, useState } from "react";
 
 // TODO: Fazer um campo para filtrar por data
 
 export default function Export(){
-
+  const { isOffline } = useContext(ModeContext);
   const [name, setName] = useState("");
   const [locationType, setLocationType] = useState("");
   // const [createdAt, setCreatedAt] = useState("");
@@ -47,7 +48,8 @@ export default function Export(){
         ...(project && { project }),
         ...(observations && { observations }),
         ...(plusCode && { plusCode })
-      }
+      },
+      isOffline
     );
 
     if(result) {

@@ -2,15 +2,17 @@ import { AppButton } from "@/components/AppButton";
 import { AppTextInput } from "@/components/AppTextInput";
 import { AppTitle } from "@/components/AppTitle";
 import { VStack, ScrollView, Box, Text, useToast, Select } from "native-base";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 // @ts-expect-error: Funciona mas a IDE estava reclamando
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { encode } from "pluscodes";
 import { registerAddress } from "@/services/Address";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Location from "expo-location";
+import { ModeContext } from "@/app/ModeContext";
 
 export default function Register(){
+  const { isOffline } = useContext(ModeContext)
   const [plusCode, setPlusCode] = useState("00000000+0000");
   const [latitude, setLatitude] = useState("");
   const [longitude, setLongitude] = useState("");
@@ -44,7 +46,7 @@ export default function Register(){
         "type": "Point",
         "coordinates": [longitude, latitude]
       }
-    })
+    }, isOffline);
 
     if (result) {
       toast.show({

@@ -5,5 +5,8 @@ export interface Address {
     project: string,
     observations?: string,
     plusCode: string,
-    location: {}
+    location: {
+        type: "Point",
+        coordinates: [any, any]
+    }
 }

@@ -7,6 +7,8 @@ import { searchAddresses } from "@/services/Address";
 import { formatDateString } from "@/utils/conversions";
 import { VStack, ScrollView } from "native-base";
 import { useState } from "react";
+import { useContext } from "react";
+import { ModeContext } from "@/app/ModeContext";
 
 export interface Address {
   _id: string,
@@ -21,12 +23,12 @@ export interface Address {
 }
 
 export default function Addresses({ navigation }: NavigationProps<"Addresses">){
-
+  const { isOffline } = useContext(ModeContext);
   const [searchState, setSearchState] = useState("");
   const [searchResult, setSearchResult] = useState([]);
 
   async function search() {
-    const result = await searchAddresses(searchState)
+    const result = await searchAddresses(searchState, isOffline);
 
     if(result) {
       setSearchResult(result)
