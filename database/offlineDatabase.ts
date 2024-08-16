@@ -1,4 +1,4 @@
-import { getAddresses } from "@/services/Address";
+import { getAddresses, registerAddress } from "@/services/Address";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SQLite from "expo-sqlite/legacy";
 import moment from 'moment';
@@ -12,7 +12,7 @@ interface Address {
     project: string,
     observations?: string,
     plusCode: string,
-    location: {coordinates: [number, number]}
+    location: {type: string, coordinates: [number, number]}
   }
 
 export async function setupOfflineDatabase() {
@@ -20,10 +20,10 @@ export async function setupOfflineDatabase() {
   
     // Deletar o banco se existir
     db.transaction(tx => {
-      tx.executeSql('DROP TABLE IF EXISTS addresses', [], () => {
+      tx.executeSql('DROP TABLE IF EXISTS addresses_to_add', [], () => {
         console.log('Tabela "addresses" deletada');
       });
-      tx.executeSql('DROP TABLE IF EXISTS addresses_to_add', [], () => {
+      tx.executeSql('DROP TABLE IF EXISTS addresses', [], () => {
         console.log('Tabela "addresses_to_add" deletada');
       });
     });
@@ -197,8 +197,77 @@ export async function searchFilteredAddressesOffline(filters: {
   });
 }
 
+// Essa função pega todos os elementos que foram adicionados de maneira offline
+// e sobe no banco de dados.
 export async function synchronizeDatabase() {
-  console.log("test");
+  const db = SQLite.openDatabase('addresses.db');
+
+  return new Promise<void>((resolve, reject) => {
+      db.transaction(tx => {
+          tx.executeSql(
+              'SELECT * FROM addresses_to_add',
+              [],
+              async (_, { rows: { _array } }) => {
+                  try {
+                      for (const address of _array) {
+                          const formattedAddress = {
+                              name: address.name,
+                              locationType: address.locationType,
+                              createdBy: address.createdBy,
+                              project: address.project,
+                              observations: address.observations,
+                              plusCode: address.plusCode,
+                              location: {
+                                  type: "Point",
+                                  coordinates: [address.longitude, address.latitude]
+                              },
+                          };
+
+                          console.log(formattedAddress)
+                          // @ts-ignore
+                          await registerAddress(formattedAddress, false);
+                      }
+
+                      resolve();
+                  } catch (error) {
+                      console.error("Erro ao sincronizar o banco de dados:", error);
+                      reject(error);
+                  }
+              },
+              (_, error) => {
+                  console.error("Erro ao buscar dados da tabela addresses_to_add:", error);
+                  reject(error);
+                  return false;
+              }
+          );
+      });
+  });
+}
+
+export async function getOneAddressOffline(addressId: string) {
+  const db = SQLite.openDatabase('addresses.db');
+
+  return new Promise<any>((resolve, reject) => {
+      db.transaction(tx => {
+          tx.executeSql(
+              'SELECT * FROM addresses WHERE _id = ?',
+              [addressId],
+              (_, { rows }) => {
+                  if (rows && rows._array.length > 0) {
+                      console.log(rows._array[0]);
+                      resolve(rows._array[0]); // Retorna o objeto encontrado
+                  } else {
+                      resolve(null); // Nenhum resultado encontrado
+                  }
+              },
+              (_, error) => {
+                  console.error("Erro ao buscar o endereço no banco de dados:", error);
+                  reject(error);
+                  return false;
+              }
+          );
+      });
+  });
 }
 
 export async function registerAddressOffline(address: {
@@ -212,8 +281,8 @@ export async function registerAddressOffline(address: {
     type: "Point";
     coordinates: [number, number];
   };
-}) {
-  const db = SQLite.openDatabase('addresses.db');
+}, table_name: string) {
+  const db = SQLite.openDatabase(`addresses.db`);
 
   // Obter informações adicionais
   const createdAt = moment().format('YYYY-MM-DDTHH:mm:ss.SSSZZ');
@@ -224,7 +293,7 @@ export async function registerAddressOffline(address: {
     db.transaction(tx => {
       // Query para inserir o endereço na tabela 'addresses'
       const query = `
-        INSERT INTO addresses 
+        INSERT INTO ${table_name} 
           (_id, name, locationType, createdBy, createdByName, project, observations, plusCode, latitude, longitude, createdAt)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
       `;

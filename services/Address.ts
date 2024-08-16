@@ -1,7 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import api from "./api";
 import { Address } from "@/interfaces/Address";
-import { getAddressesOffline, registerAddressOffline, searchAddressesOffline, searchFilteredAddressesOffline } from "@/database/offlineDatabase";
+import { getAddressesOffline, getOneAddressOffline, registerAddressOffline, searchAddressesOffline, searchFilteredAddressesOffline } from "@/database/offlineDatabase";
 
 async function getTokenHeader() {
     const token = await AsyncStorage.getItem("token");
@@ -11,7 +11,7 @@ async function getTokenHeader() {
     return config;
 }
 
-function formatResult(result: Object[]) {
+export function formatResult(result: Object[]) {
     const formattedResult = result.map((address: any) => ({
         location: {
           type: "Point",
@@ -114,7 +114,8 @@ export async function filterAddresses(searchParams: object, isOffline: boolean) 
 
 export async function registerAddress(address: Address, isOffline: boolean) {
     if(isOffline) {
-        const result: any = await registerAddressOffline(address);
+        await registerAddressOffline(address, "addresses");
+        await registerAddressOffline(address, "addresses_to_add");
         return {}; //gambiarra braba, não estou orgulhoso. Isso serve para que o toast dê um feedback positivo.
     }
     else {
@@ -131,16 +132,45 @@ export async function registerAddress(address: Address, isOffline: boolean) {
     }
 }
 
-export async function getOneAddress(addressId: string) {
-    if(!addressId) return null;
+export async function getOneAddress(addressId: string, isOffline: boolean) {
+    if(isOffline) {
+        const result = await getOneAddressOffline(addressId);
+        
+        const formattedResult = {
+            location: {
+                type: "Point",
+                coordinates: [result.longitude, result.latitude]
+              },
+              _id: result._id,
+              name: result.name || undefined,
+              locationType: result.locationType,
+              createdBy: {
+                _id: result.createdBy,
+                name: result.createdByName,
+              },
+              project: result.project,
+              observations: result.observations || undefined,
+              plusCode: result.plusCode,
+              createdAt: result.createdAt,
+              nearbyWaypoints: 0
+        }
 
-    try {
-        const result = await api.get(`/addresses/${addressId}`, await getTokenHeader());
-        return result.data;
+        return formattedResult;
     }
-    catch(error) {
-        console.log(error);
-        return null;
+    else {
+        if(!addressId) return null;
+
+        try {
+            const result = await api.get(`/addresses/${addressId}`, await getTokenHeader());
+
+            console.log(result.data)
+
+            return result.data;
+        }
+        catch(error) {
+            console.log(error);
+            return null;
+        }
     }
 }
 

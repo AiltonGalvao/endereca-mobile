@@ -3,10 +3,12 @@ import { AppTitle } from "@/components/AppTitle";
 import { deleteOneAddress, getOneAddress } from "@/services/Address";
 import { formatDateString } from "@/utils/conversions";
 import { Box, Button, Divider, Modal, ScrollView, Text, VStack } from "native-base";
-import { useEffect, useState, FC } from "react";
+import { useEffect, useState, FC, useContext } from "react";
 import MapView, { Marker } from "react-native-maps";
+import { ModeContext } from "./ModeContext";
 
 export default function AddressInformation({ route, navigation }: any) {
+    const { isOffline } = useContext(ModeContext)
     const [addressData, setAddressData] = useState<any>(null);
     const [region, setRegion] = useState({
         latitude: -48.876667,
@@ -22,7 +24,7 @@ export default function AddressInformation({ route, navigation }: any) {
         async function getAddressData() {
             if (!addressId) return null;
 
-            const result = await getOneAddress(addressId);
+            const result = await getOneAddress(addressId, isOffline);
             setAddressData(result);
             if (result && result.location && result.location.coordinates) {
                 setRegion({
