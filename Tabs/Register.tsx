@@ -5,13 +5,14 @@ import { VStack, ScrollView, Box, Text, useToast, Select } from "native-base";
 import { useContext, useEffect, useState } from "react";
 // @ts-expect-error: Funciona mas a IDE estava reclamando
 import Ionicons from "react-native-vector-icons/Ionicons";
-import { encode } from "pluscodes";
 import { registerAddress } from "@/services/Address";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Location from "expo-location";
 import { ModeContext } from "@/app/ModeContext";
+const OpenLocationCode = require('open-location-code').OpenLocationCode;
 
 export default function Register(){
+  const openLocationCode = new OpenLocationCode();
   const { isOffline } = useContext(ModeContext)
   const [plusCode, setPlusCode] = useState("00000000+0000");
   const [latitude, setLatitude] = useState("");
@@ -65,7 +66,7 @@ export default function Register(){
   }
 
   function calculatePlusCode(latitude: string, longitude: string) {
-    const plusCode = encode({ latitude: latitude, longitude: longitude }, 10) || "00000000+0000";
+    const plusCode = openLocationCode.encode(latitude, longitude, 12) || "00000000+0000";
     setPlusCode(plusCode);
   }
 
