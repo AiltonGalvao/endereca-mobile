@@ -9,6 +9,15 @@ import { jwtDecode } from "jwt-decode";
 // @ts-expect-error: Funciona mas a IDE estava reclamando
 import Logo from "@/assets/Logo.png";
 
+/*
+
+Essa é a tela de Login. Não existe tela de registro pois o registro de novas contas deverá ser feito
+direto pela API por questões de segurança
+
+Esse useState é o estado inicial de cada variável
+
+*/
+
 export default function Login({ navigation }: { navigation: any }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

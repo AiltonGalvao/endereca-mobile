@@ -8,11 +8,24 @@ import { useEffect, useState, useContext } from "react";
 import { ModeContext } from "@/app/ModeContext";
 import { setupOfflineDatabase, synchronizeDatabase } from "@/database/offlineDatabase";
 
+/* 
+
+Essa tela aqui é a tela de perfil
+
+*/
 export default function Profile({ navigation }: { navigation: any }) {
   const [userData, setUserData] = useState({} as User);
   const { isOffline, setIsOffline } = useContext(ModeContext);
+  // TODO: Colocar uma imagem local nos assets
   const blankPfp = "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png";
   const [isSwitchEnabled, setIsSwitchEnabled] = useState(true);
+
+  /* 
+  
+  Esses dois useEffect servem para manter o botão do modo offline na opção correta
+  mesmo se o usuário fechar e abrir o aplicativo denovo
+  
+  */
 
   useEffect(() => {
     async function userData() {
@@ -47,6 +60,8 @@ export default function Profile({ navigation }: { navigation: any }) {
 
       setIsSwitchEnabled(false);
 
+      // Esse timeout serve para evitar que o usuário possa ligar e desligar a função offline
+      // sem parar, assim evitando algum bug com criação de tabelas e sincronização
       setTimeout(() => {
         setIsSwitchEnabled(true);
       }, 5000);

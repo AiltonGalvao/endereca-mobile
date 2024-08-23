@@ -3,6 +3,8 @@ import { THEMES } from "@/styles/themes";
 import Routes from './Routes';
 import { ModeProvider } from './ModeContext';
 
+// A raiz do aplicativo, tudo começa aqui
+
 export default function App() {
   return (
     <ModeProvider>

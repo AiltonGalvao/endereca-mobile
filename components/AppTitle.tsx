@@ -1,6 +1,8 @@
 import { Text, ITextProps } from "native-base"
 import { ReactNode } from "react"
 
+// Pode ser o nome de título, mas é usado como texto comum também
+
 interface TituloProps extends ITextProps {
   children: ReactNode
 }

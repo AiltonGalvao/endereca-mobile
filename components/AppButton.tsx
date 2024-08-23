@@ -1,6 +1,8 @@
 import { Button, IButtonProps } from 'native-base';
 import { ReactNode } from "react";
 
+// Componente simples de botão, com os estilos usados durante toda a aplicação.
+
 interface ButtonProps extends IButtonProps {
   children: ReactNode;
   autoSize?: boolean;

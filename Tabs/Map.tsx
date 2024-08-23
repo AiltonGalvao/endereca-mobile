@@ -3,6 +3,13 @@ import { AppTitle } from "@/components/AppTitle";
 import { VStack, ScrollView } from "native-base";
 import MapView from 'react-native-maps';
 
+/*
+
+Sendo sincero, essa tela aqui não tem mais propósito, pois um mapa foi
+incorporado na visão detalhada de cada endereço
+
+*/
+
 export default function Map(){
 
   return (

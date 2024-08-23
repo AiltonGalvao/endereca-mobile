@@ -18,10 +18,12 @@ interface Address {
     }
 }
 
+// Pega o formato de data do MongoDB e converte para algo mais amigável para humanos
 export function formatDateString(date: string) {
     return `${date.slice(8, 10)}/${date.slice(5, 7)}/${date.slice(0, 4)} ${date.slice(11, 19)}`;
 }
 
+// Converte uma lista de endereços para um objeto CSV e depois salva o arquivo
 export function saveAsCSV(list_of_addresses: Address[]) {
     const csvString = [
         [
@@ -53,12 +55,14 @@ export function saveAsCSV(list_of_addresses: Address[]) {
     saveFile(csvString, "csv");
 }
 
+// Converte uma lista de endereços para um objeto KML e depois salva o arquivo
 export function saveAsKML(list_of_addresses: Address[]) {
     const obj = convertToGeoJSON(list_of_addresses);
     const kmlString = tokml(obj);
     saveFile(kmlString, "kml");
 }
 
+// Função auxiliar do saveAsKML, pois talvez no futuro fosse útil para o GEO ter esse formato separado
 function convertToGeoJSON(list_of_addresses: Address[]) {
     const geoJSON = {
         type: "FeatureCollection",

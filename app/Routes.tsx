@@ -2,6 +2,12 @@ import React from "react";
 import { NavigationContainer } from '@react-navigation/native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 
+/*
+
+Bem simples, define as rotas do aplicativo e sua navegação
+
+*/
+
 const Tab = createNativeStackNavigator();
 
 import Login from "./Login";

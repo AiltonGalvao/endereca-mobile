@@ -3,6 +3,19 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SQLite from "expo-sqlite/legacy";
 import moment from 'moment';
 
+/*
+
+Aqui se encontra o principal código responsável pela funcionalidade offline do aplicativo. Tem
+bastante coisa então vou explicando um por um
+
+*/
+
+/*
+
+Essa interface aqui é a interface do objeto endereço que é recebido do banco de dados MongoDB. A
+estrutura da entidade endereço no SQLite é levemente diferente da do Mongo.
+
+*/
 interface Address {
     _id: string,
     name?: string,
@@ -15,6 +28,12 @@ interface Address {
     location: {type: string, coordinates: [number, number]}
   }
 
+/*
+
+Essa função aqui é responsável por criar o banco de dados SQLite (Offline). Depois de criado
+ele é preenchido pelos dados retirados do MongoDB
+
+*/
 export async function setupOfflineDatabase() {
     const db = SQLite.openDatabase('addresses.db');
   
@@ -28,7 +47,13 @@ export async function setupOfflineDatabase() {
       });
     });
   
-    // Criar novas tabelas
+    /* 
+    
+    São criadas duas tabelas por um motivo simples: Existe a tabela dos endereços que já estavam no
+    banco de dados do Mongo, e existe a tabela dos endereços que vão ser adicionados assim que o 
+    modo offline for desligado
+
+    */
     db.transaction(tx => {
       tx.executeSql(`
         CREATE TABLE IF NOT EXISTS addresses (
@@ -70,6 +95,16 @@ export async function setupOfflineDatabase() {
       db.transaction(tx => {
         addresses.forEach((address : Address) => {
           const { _id, name, locationType, createdBy, project, observations, plusCode, createdAt } = address;
+
+          /* 
+          
+          Os três atributos seguintes são estruturados de maneira diferente do Mongo. Eu tinha planos para criar uma função
+          de proximidade para endereços no modo offline também, mas não deu tempo.
+
+          O createdAt é guardado pois ele é necessário quando o modo offline é desligado. Mas como não é possível puxar
+          o nome do cadastrador no banco offline, então cria-se um campo novo apenas com o nome
+
+          */
           const latitude = address.location.coordinates[1];
           const longitude = address.location.coordinates[0];
           const createdByName = address.createdBy.name;
@@ -93,6 +128,11 @@ export async function setupOfflineDatabase() {
     //});
 }
 
+/*
+
+Essa função aqui é responsável por pesquisar um termo em todos os campos dos endereços
+
+*/
 export async function searchAddressesOffline(searchString: string) {
     const db = SQLite.openDatabase('addresses.db');
     
@@ -116,6 +156,11 @@ export async function searchAddressesOffline(searchString: string) {
     });
 }
 
+/*
+
+Essa função pega todos os endereços do banco SQLite
+
+*/
 export async function getAddressesOffline() {
   const db = SQLite.openDatabase('addresses.db');
 
@@ -136,6 +181,11 @@ export async function getAddressesOffline() {
   });
 }
 
+/*
+
+Essa função funciona do mesmo jeito que o filtered_search.
+
+*/
 export async function searchFilteredAddressesOffline(filters: {
     name?: string;
     locationType?: string;
@@ -197,8 +247,12 @@ export async function searchFilteredAddressesOffline(filters: {
   });
 }
 
-// Essa função pega todos os elementos que foram adicionados de maneira offline
-// e sobe no banco de dados.
+/*
+
+Essa função pega todos os elementos que foram adicionados de maneira offline e sobe no banco
+de dados MongoDB
+
+*/
 export async function synchronizeDatabase() {
   const db = SQLite.openDatabase('addresses.db');
 
@@ -244,6 +298,8 @@ export async function synchronizeDatabase() {
   });
 }
 
+// Essa função procura um endereço no banco de dados pelo ID
+
 export async function getOneAddressOffline(addressId: string) {
   const db = SQLite.openDatabase('addresses.db');
 
@@ -270,6 +326,13 @@ export async function getOneAddressOffline(addressId: string) {
   });
 }
 
+/*
+
+Como dito na função de criação de tabelas, quando um endereço é adicionado de maneira offline,
+ele adiciona em duas tabelas: Uma para ser usada pelas funções offline do aplicativo, e a outra
+guarda os endereços que serão adicionados quando o modo offline for desligado
+
+*/
 export async function registerAddressOffline(address: {
   name?: string;
   locationType: string;

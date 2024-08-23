@@ -4,6 +4,13 @@ import { AppButton } from "./AppButton";
 // @ts-expect-error: Funciona mas a IDE estava reclamando
 import Ionicons from "react-native-vector-icons/Ionicons";
 
+/*
+
+Esse aqui é um componente importante, pois ele é responsável por exibir informações
+de um endereço na tela de pesquisa geral
+
+*/
+
 interface CardProps {
     name?: string,
     locationType: string,

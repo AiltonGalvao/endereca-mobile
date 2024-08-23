@@ -1,6 +1,12 @@
 import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 
+/*
+
+Essa função é responsável por salvar arquivos no celular do usuário. Por algum motivo mesmo com a permissão ele
+não consegue salvar em certas pastas
+
+*/
 export const saveFile = async (stringContent: string, fileFormat: string) => {
     try {
       const permissions = await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync(); // Essa linha pede permissão para acesso aos arquivos
@@ -8,7 +14,7 @@ export const saveFile = async (stringContent: string, fileFormat: string) => {
         const uri = await FileSystem.StorageAccessFramework.createFileAsync(permissions.directoryUri, `${getCurrentTime()}.${fileFormat}`, `text/${fileFormat}`);
         await FileSystem.writeAsStringAsync(uri, stringContent, { encoding: FileSystem.EncodingType.UTF8 });
         console.log(`Arquivo salvo em ${uri}`);
-      } else { // Se não for ele usa a Sharing API
+      } else { // Se não for ele usa a Sharing API (Não entendo muito bem esse pedaço aqui)
         const path = `${FileSystem.documentDirectory}${getCurrentTime()}.${fileFormat}`;
         await FileSystem.writeAsStringAsync(path, stringContent, { encoding: FileSystem.EncodingType.UTF8 });
         await Sharing.shareAsync(path);
@@ -18,6 +24,7 @@ export const saveFile = async (stringContent: string, fileFormat: string) => {
     }
   };
 
+  // Função auxiliar, é usada para nomear os arquivos criados pela função saveFile
   function getCurrentTime() {
     const today = new Date();
     const dd = String(today.getDate()).padStart(2, '0');

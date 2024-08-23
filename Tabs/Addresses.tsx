@@ -22,11 +22,19 @@ export interface Address {
   location: string
 }
 
+/*
+
+Essa tela aqui cuida da pesquisa em todos os campos dos endereços, e da visualização de
+cards com informações desses endereços. Também é possível clicar no ícone de lupa para
+mostrar outra tela que vai prover informações adicionais sobre o endereço
+
+*/
 export default function Addresses({ navigation }: NavigationProps<"Addresses">){
   const { isOffline } = useContext(ModeContext);
   const [searchState, setSearchState] = useState("");
   const [searchResult, setSearchResult] = useState([]);
 
+  // Função de pesquisa
   async function search() {
     const result = await searchAddresses(searchState, isOffline);
 

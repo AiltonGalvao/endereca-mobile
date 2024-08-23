@@ -3,6 +3,15 @@ import api from "./api";
 import { Address } from "@/interfaces/Address";
 import { getAddressesOffline, getOneAddressOffline, registerAddressOffline, searchAddressesOffline, searchFilteredAddressesOffline } from "@/database/offlineDatabase";
 
+/*
+
+A lógica de quase todas as funções aqui é bem simples. Se o modo offline estiver habilitado,
+então ele se comunica com o SQLite por meio de funções específicas. Senão, então ele faz
+requests para a API
+
+*/
+
+// Devolve o Token guardado no Async Storage
 async function getTokenHeader() {
     const token = await AsyncStorage.getItem("token");
     const config = {
@@ -11,6 +20,15 @@ async function getTokenHeader() {
     return config;
 }
 
+/*
+
+Todos os dados fornecidos para as telas do aplicativo seguem a estrutura JSON que vem da 
+API. Portanto, é muito melhor ter uma função que formata os dados do SQLite do mesmo jeito
+que a API do que ter dois jeitos diferentes de consumir esses dados
+
+A função abaixo serve justamente para isso
+
+*/
 export function formatResult(result: Object[]) {
     const formattedResult = result.map((address: any) => ({
         location: {
@@ -116,7 +134,7 @@ export async function registerAddress(address: Address, isOffline: boolean) {
     if(isOffline) {
         await registerAddressOffline(address, "addresses");
         await registerAddressOffline(address, "addresses_to_add");
-        return {}; //gambiarra braba, não estou orgulhoso. Isso serve para que o toast dê um feedback positivo.
+        return {}; // Gambiarra braba, não estou orgulhoso. Isso serve para que o toast (aquele texto de confirmação) dê um feedback positivo.
     }
     else {
         if(!address) return null;
@@ -136,6 +154,8 @@ export async function getOneAddress(addressId: string, isOffline: boolean) {
     if(isOffline) {
         const result = await getOneAddressOffline(addressId);
         
+        // Não consegui usar a função de formação aqui por algum motivo, aí tive
+        // que fazer na "mão" mesmo pois estava sem tempo
         const formattedResult = {
             location: {
                 type: "Point",

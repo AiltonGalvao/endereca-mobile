@@ -7,6 +7,13 @@ import { useEffect, useState, FC, useContext } from "react";
 import MapView, { Marker } from "react-native-maps";
 import { ModeContext } from "./ModeContext";
 
+/*
+
+Essa tela é chamada quando se clica no ícone de lupa na tela de vizualização de endereço. Nela
+são exibidos vários detalhes, além de uma vizualização no mapa.
+
+*/
+
 export default function AddressInformation({ route, navigation }: any) {
     const { isOffline } = useContext(ModeContext)
     const [addressData, setAddressData] = useState<any>(null);
@@ -44,6 +51,13 @@ export default function AddressInformation({ route, navigation }: any) {
         getAddressData();
     }, [addressId]);
 
+    /* 
+    
+    Essa interface e SafeComponentLoader era uma função que eu estava fazendo para tentar carregar o MapView. Se ele não
+    conseguisse, pelo menos não crashava o aplicativo todo. Mas acabei não terminando
+
+    */
+
     interface SafeComponentLoaderProps {
         component: FC;
         fallback?: React.ReactNode;
@@ -71,6 +85,13 @@ export default function AddressInformation({ route, navigation }: any) {
             console.error("Erro ao deletar o endereço", error);
         }
     };
+
+    /*
+    
+    Por algum motivo, o MapView faz o aplicativo parar de funcionar quando é chamado em um celular
+    de verdade (no emulador não há esse problema). Eu não consegui descobrir o motivo
+
+    */
 
     return (
         <ScrollView flex={1} p={5} backgroundColor="white">

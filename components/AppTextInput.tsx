@@ -1,5 +1,12 @@
 import { Input, FormControl } from "native-base";
 
+/*
+
+Talvez o componente mais importante da aplicação, pois é responsável por
+receber inputs de texto. Parece meio bagunçado mas funciona bem
+
+*/
+
 interface InputProps {
   label?: string;
   placeholder: string;

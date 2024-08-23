@@ -10,6 +10,8 @@ import { Dispatch, useContext, useState } from "react";
 
 // TODO: Fazer um campo para filtrar por data
 
+// TODO: Fazer uma função que "desmarca" uma opção de exportação se você escolher a outra"
+
 export default function Export(){
   const { isOffline } = useContext(ModeContext);
   const [name, setName] = useState("");

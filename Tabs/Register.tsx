@@ -11,6 +11,12 @@ import * as Location from "expo-location";
 import { ModeContext } from "@/app/ModeContext";
 const OpenLocationCode = require('open-location-code').OpenLocationCode;
 
+/*
+
+Essa tela aqui cuida do registro de endereços. O valor do Pluscode é calculado
+dinamicamente à medida que o endereço vai sendo digitado
+
+*/
 export default function Register(){
   const openLocationCode = new OpenLocationCode();
   const { isOffline } = useContext(ModeContext)
@@ -49,6 +55,7 @@ export default function Register(){
       }
     }, isOffline);
 
+    // Esse "toast" é um quadrado que aparece para notificar o usuário se conseguiu ou não registrar
     if (result) {
       toast.show({
         title: 'Endereço cadastrado',
